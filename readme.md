@@ -15,7 +15,7 @@ For example if the testing hardware is compatible with CUDA 11.7:
 ```
 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117
 ```
-Testing the application outside localhost requires an SSL certificate for the WebRTC functionality. This applies to e.g. if the web server is accessed with another device in a local network. This can be done by generating cert.pem and key.pem with [OpenSSL](https://www.openssl.org/):
+Testing the application outside localhost requires an SSL certificate for the WebRTC functionality. This applies to e.g. if the web server is accessed with another device in a local network. This can be done by generating a self-signed certificate. Running the below command creates cert.pem and key.pem that can be used in the project. This requires [OpenSSL](https://www.openssl.org/):
 
 ```
 openssl req -newkey rsa:2048 -x509 -nodes -keyout key.pem -new -out cert.pem -config req.cnf -sha256 -days 3650
