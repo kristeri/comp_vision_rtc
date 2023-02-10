@@ -1,4 +1,4 @@
-from torchvision.models.segmentation import fcn_resnet50, FCN_ResNet50_Weights
+from torchvision.models.segmentation import deeplabv3_mobilenet_v3_large, DeepLabV3_MobileNet_V3_Large_Weights
 import torchvision.transforms as transforms
 
 from PIL import Image
@@ -13,7 +13,7 @@ MIN_SCORE = 0.85
 
 class SemanticSegmentation:
     def __init__(self):
-        self.weights = FCN_ResNet50_Weights.DEFAULT
+        self.weights = DeepLabV3_MobileNet_V3_Large_Weights.DEFAULT
         self.model = self.init_model()
         self.preprocess = self.init_preprocess()
         self.number_of_classes = len(self.weights.meta["categories"])
@@ -21,7 +21,7 @@ class SemanticSegmentation:
 
     def init_model(self):
         # Initialize model with the best available weights
-        model = fcn_resnet50(weights=self.weights)
+        model = deeplabv3_mobilenet_v3_large(weights=self.weights)
         model.to(DEVICE)
         model.eval()
         for param in model.parameters():

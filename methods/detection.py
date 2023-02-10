@@ -4,7 +4,6 @@ import cv2 as cv
 import numpy as np
 from time import time
 import torch
-import math
 
 # Set the device (GPU or CPU) used to run the model
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -53,8 +52,7 @@ class ObjectDetection:
         prediction = self.model(batch)[0]
         labels = [self.weights.meta["categories"][i] for i in prediction["labels"]]
 
-        # Scale factor for drawing
-        scaled = math.ceil(len(frame) / 300)
+        scaled = 2
 
         for i in range(0, len(prediction["boxes"])):
             # Get the confidence of the prediction

@@ -1,4 +1,4 @@
-from torchvision.models.vgg import vgg16, VGG16_Weights
+from torchvision.models.convnext import convnext_large, ConvNeXt_Large_Weights
 from PIL import Image
 import cv2 as cv
 import numpy as np
@@ -11,7 +11,7 @@ MIN_SCORE = 0.85
 
 class Classification:
     def __init__(self):
-        self.weights = VGG16_Weights.DEFAULT
+        self.weights = ConvNeXt_Large_Weights.DEFAULT
         self.model = self.init_model()
         self.preprocess = self.init_preprocess()
         self.number_of_classes = len(self.weights.meta["categories"])
@@ -19,7 +19,7 @@ class Classification:
 
     def init_model(self):
         # Initialize model with the best available weights
-        model = vgg16(weights=self.weights)
+        model = convnext_large(weights=self.weights)
         model.to(DEVICE)
         model.eval()
         for param in model.parameters():

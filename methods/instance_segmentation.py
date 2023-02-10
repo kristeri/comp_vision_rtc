@@ -67,7 +67,7 @@ class InstanceSegmentation:
 
                 text = "{}: {:.2f}%".format(labels[i], confidence * 100)
                 #print("The object is: {}".format(text))
-                scaled = math.ceil(len(frame) / 250)
+                scaled = 2
 
                 r = np.zeros_like(mask).astype(np.uint8)
                 g = np.zeros_like(mask).astype(np.uint8)
