@@ -1,6 +1,5 @@
 // get DOM elements
-var dataChannelLog = document.getElementById('data-channel'),
-    iceConnectionLog = document.getElementById('ice-connection-state'),
+var iceConnectionLog = document.getElementById('ice-connection-state'),
     iceGatheringLog = document.getElementById('ice-gathering-state'),
     signalingLog = document.getElementById('signaling-state');
 
@@ -37,12 +36,10 @@ function createPeerConnection() {
     }, false);
     signalingLog.textContent = pc.signalingState;
 
-    // connect audio / video
+    // connect video
     pc.addEventListener('track', function(evt) {
         if (evt.track.kind == 'video')
             document.getElementById('video').srcObject = evt.streams[0];
-        else
-            document.getElementById('audio').srcObject = evt.streams[0];
     });
 
     return pc;
@@ -69,11 +66,6 @@ function negotiate() {
     }).then(function() {
         var offer = pc.localDescription;
         var codec;
-
-        codec = document.getElementById('audio-codec').value;
-        if (codec !== 'default') {
-            offer.sdp = sdpFilterCodec('audio', codec, offer.sdp);
-        }
 
         codec = document.getElementById('video-codec').value;
         if (codec !== 'default') {
@@ -118,34 +110,7 @@ function start() {
         }
     }
 
-    if (document.getElementById('use-datachannel').checked) {
-        var parameters = JSON.parse(document.getElementById('datachannel-parameters').value);
-
-        dc = pc.createDataChannel('chat', parameters);
-        dc.onclose = function() {
-            clearInterval(dcInterval);
-            dataChannelLog.textContent += '- close\n';
-        };
-        dc.onopen = function() {
-            dataChannelLog.textContent += '- open\n';
-            dcInterval = setInterval(function() {
-                var message = 'ping ' + current_stamp();
-                dataChannelLog.textContent += '> ' + message + '\n';
-                dc.send(message);
-            }, 1000);
-        };
-        dc.onmessage = function(evt) {
-            dataChannelLog.textContent += '< ' + evt.data + '\n';
-
-            if (evt.data.substring(0, 4) === 'pong') {
-                var elapsed_ms = current_stamp() - parseInt(evt.data.substring(5), 10);
-                dataChannelLog.textContent += ' RTT ' + elapsed_ms + ' ms\n';
-            }
-        };
-    }
-
     var constraints = {
-        audio: document.getElementById('use-audio').checked,
         video: false
     };
 
@@ -168,7 +133,7 @@ function start() {
         }
     }
 
-    if (constraints.audio || constraints.video) {
+    if (constraints.video) {
         if (constraints.video) {
             document.getElementById('media').style.display = 'block';
         }
@@ -204,7 +169,7 @@ function stop() {
         });
     }
 
-    // close local audio / video
+    // close local video
     pc.getSenders().forEach(function(sender) {
         sender.track.stop();
     });
