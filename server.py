@@ -44,30 +44,30 @@ class VideoTransformTrack(MediaStreamTrack):
         frame = await self.track.recv()
 
         if self.transform == "classification":
-            img = frame.to_ndarray(format="bgr24")
+            img = frame.to_ndarray(format="rgb24")
             processed_img = classification.classify_objects_in_frame(img)
-            new_frame = VideoFrame.from_ndarray(processed_img, format="bgr24")
+            new_frame = VideoFrame.from_ndarray(processed_img, format="rgb24")
             new_frame.pts = frame.pts
             new_frame.time_base = frame.time_base
             return new_frame
         elif self.transform == "detection":
-            img = frame.to_ndarray(format="bgr24")
+            img = frame.to_ndarray(format="rgb24")
             processed_img = object_detection.detect_objects_in_frame(img)
-            new_frame = VideoFrame.from_ndarray(processed_img, format="bgr24")
+            new_frame = VideoFrame.from_ndarray(processed_img, format="rgb24")
             new_frame.pts = frame.pts
             new_frame.time_base = frame.time_base
             return new_frame
         elif self.transform == "semantic_segmentation":
-            img = frame.to_ndarray(format="bgr24")
+            img = frame.to_ndarray(format="rgb24")
             processed_img = semantic_segmentation.recognize_objects_in_frame(img)
-            new_frame = VideoFrame.from_ndarray(processed_img, format="bgr24")
+            new_frame = VideoFrame.from_ndarray(processed_img, format="rgb24")
             new_frame.pts = frame.pts
             new_frame.time_base = frame.time_base
             return new_frame
         elif self.transform == "instance_segmentation":
-            img = frame.to_ndarray(format="bgr24")
+            img = frame.to_ndarray(format="rgb24")
             processed_img = instance_segmentation.recognize_objects_in_frame(img)
-            new_frame = VideoFrame.from_ndarray(processed_img, format="bgr24")
+            new_frame = VideoFrame.from_ndarray(processed_img, format="rgb24")
             new_frame.pts = frame.pts
             new_frame.time_base = frame.time_base
             return new_frame
