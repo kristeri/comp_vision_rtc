@@ -16,6 +16,7 @@ from methods.classification import Classification
 from methods.detection import ObjectDetection
 from methods.instance_segmentation import InstanceSegmentation
 from methods.semantic_segmentation import SemanticSegmentation
+from methods.detection_yolo import ObjectDetectionYOLO
 
 ROOT = os.path.dirname(__file__)
 
@@ -25,6 +26,7 @@ relay = MediaRelay()
 
 classification = Classification()
 object_detection = ObjectDetection()
+object_detection_yolo = ObjectDetectionYOLO()
 semantic_segmentation = SemanticSegmentation()
 instance_segmentation = InstanceSegmentation()
 
@@ -53,6 +55,13 @@ class VideoTransformTrack(MediaStreamTrack):
         elif self.transform == "detection":
             img = frame.to_ndarray(format="rgb24")
             processed_img = object_detection.detect_objects_in_frame(img)
+            new_frame = VideoFrame.from_ndarray(processed_img, format="rgb24")
+            new_frame.pts = frame.pts
+            new_frame.time_base = frame.time_base
+            return new_frame
+        elif self.transform == "detection_yolo":
+            img = frame.to_ndarray(format="rgb24")
+            processed_img = object_detection_yolo.detect_objects_in_frame(img)
             new_frame = VideoFrame.from_ndarray(processed_img, format="rgb24")
             new_frame.pts = frame.pts
             new_frame.time_base = frame.time_base

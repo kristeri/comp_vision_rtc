@@ -16,6 +16,10 @@ class Classification:
         self.preprocess = self.init_preprocess()
         self.number_of_classes = len(self.weights.meta["categories"])
         self.colors = np.random.uniform(0, 255, size=(self.number_of_classes, 3))
+        self.avg_fps = 0.00
+        self.nof_frames = 0.00
+        self.total_fps = 0.00
+        self.fps_per_frame = []
 
     def init_model(self):
         # Initialize model with the best available weights
@@ -64,8 +68,17 @@ class Classification:
         end_time = time()
         print(f"Frame processing took: {end_time - start_time} seconds")
 
-        fps = 1 / np.round(end_time - start_time, 3)
-        fps_string = "FPS: {:.2f}".format(fps)
-        cv.putText(frame, fps_string, (0, 25), cv.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
 
+        fps = 1 / np.round(end_time - start_time, 3)
+        arr = self.fps_per_frame
+        arr.append(fps)
+        self.fps_per_frame = arr
+        fps_string = "FPS: {:.2f}".format(fps)
+        self.nof_frames = self.nof_frames + 1
+        self.total_fps += fps
+        self.avg_fps = self.total_fps / self.nof_frames
+        print(f"Average FPS: {self.avg_fps}")
+
+        cv.putText(frame, fps_string, (0, 25), cv.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
+        
         return frame
