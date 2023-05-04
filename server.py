@@ -12,6 +12,9 @@ from av import VideoFrame
 from aiortc import MediaStreamTrack, RTCPeerConnection, RTCSessionDescription
 from aiortc.contrib.media import MediaBlackhole, MediaPlayer, MediaRecorder, MediaRelay
 
+from time import time
+import threading
+
 from methods.classification import Classification
 from methods.detection import ObjectDetection
 from methods.instance_segmentation import InstanceSegmentation
@@ -41,9 +44,34 @@ class VideoTransformTrack(MediaStreamTrack):
         super().__init__()
         self.track = track
         self.transform = transform
+        self.nof_frames = 0
+        self.round_trip_time = []
+        self.jitter = []
+        self.time = time()
+        self.times = []
 
     async def recv(self):
         frame = await self.track.recv()
+        stats = await list(pcs)[0].getStats()
+        stats_list = list(stats.values())
+        #logging.info(f"WebRTC stats: {stats_list[2] }")
+        # For latency statistics
+        inbound_stats = stats_list[2]
+        time_now = time()
+        print(time_now)
+        difference = int((time_now - self.time))
+        if (difference <= 60 and hasattr(inbound_stats, 'roundTripTime') and hasattr(inbound_stats, 'jitter')):
+            self.times.append(difference)
+            self.round_trip_time.append(getattr(stats_list[2], 'roundTripTime'))
+            self.jitter.append(getattr(stats_list[2], 'jitter'))
+        else:
+            print(self.times)
+            print("\n")
+            print(self.round_trip_time)
+            print("\n")
+            print(self.jitter)
+
+        self.nof_frames += 1
 
         if self.transform == "classification":
             img = frame.to_ndarray(format="rgb24")
