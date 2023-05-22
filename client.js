@@ -1,7 +1,8 @@
 // get DOM elements
 var iceConnectionLog = document.getElementById('ice-connection-state'),
     iceGatheringLog = document.getElementById('ice-gathering-state'),
-    signalingLog = document.getElementById('signaling-state');
+    signalingLog = document.getElementById('signaling-state'),
+    timestampLog = document.getElementById('timestamp')
 
 // peer connection
 var pc = null;
@@ -122,13 +123,13 @@ function start() {
                 width: parseInt(resolution[0], 0),
                 height: parseInt(resolution[1], 0),
                 facingMode: document.getElementById('camera-mode').value,
-                frameRate: 10
+                frameRate: 30
             };
         } else {
             //constraints.video = true;
             constraints.video = {
                 facingMode: document.getElementById('camera-mode').value,
-                frameRate: 10
+                frameRate: 30
             }
         }
     }
@@ -150,6 +151,35 @@ function start() {
     }
 
     document.getElementById('stop').style.display = 'inline-block';
+
+    timestampLog.textContent += ' -> ' + new Date().getTime();
+
+    //setInterval(() => {
+        pc.getStats(null).then((stats) => {
+          let statsOutput = "";
+      
+          stats.forEach((report) => {
+            statsOutput +=
+              `<h2>Report: ${report.type}</h2>\n<strong>ID:</strong> ${report.id}<br>\n` +
+              `<strong>Timestamp:</strong> ${report.timestamp}<br>\n`;
+      
+            // Now the statistics for this report; we intentionally drop the ones we
+            // sorted to the top above
+      
+            Object.keys(report).forEach((statName) => {
+              if (
+                statName !== "id" &&
+                statName !== "timestamp" &&
+                statName !== "type"
+              ) {
+                statsOutput += `<strong>${statName}:</strong> ${report[statName]}<br>\n`;
+              }
+            });
+          });
+      
+          document.querySelector("#stats-box").innerHTML = statsOutput;
+        });
+      //}, 1000);
 }
 
 function stop() {

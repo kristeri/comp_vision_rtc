@@ -51,25 +51,26 @@ class VideoTransformTrack(MediaStreamTrack):
         self.times = []
 
     async def recv(self):
+        time_start = time()
+        print(time_start)
         frame = await self.track.recv()
         stats = await list(pcs)[0].getStats()
         stats_list = list(stats.values())
-        #logging.info(f"WebRTC stats: {stats_list[2] }")
+        logging.info(f"WebRTC stats: {stats_list}")
         # For latency statistics
         inbound_stats = stats_list[2]
-        time_now = time()
-        print(time_now)
-        difference = int((time_now - self.time))
+        
+        difference = int((time_start - self.time))
         if (difference <= 60 and hasattr(inbound_stats, 'roundTripTime') and hasattr(inbound_stats, 'jitter')):
             self.times.append(difference)
             self.round_trip_time.append(getattr(stats_list[2], 'roundTripTime'))
             self.jitter.append(getattr(stats_list[2], 'jitter'))
         else:
-            print(self.times)
+            #print(self.times)
             print("\n")
-            print(self.round_trip_time)
+            #print(self.round_trip_time)
             print("\n")
-            print(self.jitter)
+            #print(self.jitter)
 
         self.nof_frames += 1
 
@@ -88,6 +89,7 @@ class VideoTransformTrack(MediaStreamTrack):
             new_frame.time_base = frame.time_base
             return new_frame
         elif self.transform == "detection_yolo":
+            print("Time transmission start to processing: " + str(time() - time_start))
             img = frame.to_ndarray(format="rgb24")
             processed_img = object_detection_yolo.detect_objects_in_frame(img)
             new_frame = VideoFrame.from_ndarray(processed_img, format="rgb24")
@@ -110,6 +112,7 @@ class VideoTransformTrack(MediaStreamTrack):
             return new_frame
         else:
             return frame
+    print("Time end: " + str(time()))
 
 async def index(request):
     content = open(os.path.join(ROOT, "index.html"), "r").read()

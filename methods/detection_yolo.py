@@ -31,14 +31,18 @@ class ObjectDetectionYOLO:
     def detect_objects_in_frame(self, frame):
         self.sync_cuda()
         start_time = time()
+        start_time_inf = time()
 
         result = self.model(frame)
+        end_time_inf = time()
+        print(f"Inference took: {end_time_inf - start_time_inf} seconds")
+        start_time_processing = time()
 
         frame = np.squeeze(result.render())
 
         self.sync_cuda()
         end_time = time()
-        print(f"Frame processing took: {end_time - start_time} seconds")
+        
 
         fps = 1 / np.round(end_time - start_time, 3)
         arr = self.fps_per_frame
@@ -51,5 +55,8 @@ class ObjectDetectionYOLO:
         print(f"Average FPS: {self.avg_fps}")
 
         cv.putText(frame, fps_string, (0, 25), cv.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
+
+        end_time_processing = time()
+        print(f"Frame processing took: {end_time_processing - start_time_processing} seconds")
 
         return frame
